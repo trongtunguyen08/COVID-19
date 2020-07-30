@@ -1,0 +1,1 @@
+export default url = `https://covid-api.com/api`
