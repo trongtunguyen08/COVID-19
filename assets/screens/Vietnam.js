@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, StatusBar, ActivityIndicator } from 'react-native';
-import { List, Headline, Caption, Button } from 'react-native-paper';
+import { List, Headline, Caption, Button, IconButton } from 'react-native-paper';
 import Axios from 'axios'
 import URL from '../api/url'
+import KhaiBaoYTe from './KhaiBaoYT'
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      showKBYT: true,
       date: '',
       confirmed: '',
       confirmed_diff: '',
@@ -20,27 +22,27 @@ export default class Home extends Component {
       antiCOVID: [
         {
           step: 1,
-          stepColor: '#523906',
+          stepColor: '#00bcd4',
           content: 'Không đến vùng có dịch, hạn chế đến nơi đông người',
-          contentColor: '#62760c'
+          contentColor: '#b2ebf2'
         },
         {
           step: 2,
-          stepColor: '#322f3d',
+          stepColor: '#dd2c00',
           content: 'Hạn chế tiếp xúc trực tiếp với người bệnh đường hô hấp cấp tính (sốt, ho, khó thở)',
-          contentColor: '#4b5d67'
+          contentColor: '#ff5722'
         },
         {
           step: 3,
-          stepColor: '#1b1c25',
+          stepColor: '#4b5d67',
           content: 'Che miệng, mũi khi ho và hắt hơi',
-          contentColor: '#1f4068'
+          contentColor: '#4f8a8b'
         },
         {
           step: 4,
-          stepColor: '#838383',
+          stepColor: '#ffd36b',
           content: 'Vệ sinh các nhân thường xuyên',
-          contentColor: '#d9adad'
+          contentColor: '#ffe78f'
         },
         {
           step: 5,
@@ -56,26 +58,26 @@ export default class Home extends Component {
         },
         {
           step: 7,
-          stepColor: '#221f3b',
-          contentColor: '#6f4a8e',
+          stepColor: '#6f4a8e',
+          contentColor: '#848ccf',
           content: 'Không mua bán, tiếp xúc với các loài động vật hoang dã'
         },
         {
           step: 8,
-          stepColor: '#251f44',
-          contentColor: '#d3dbff',
+          stepColor: '#0f4c75',
+          contentColor: '#3282b8',
           content: 'Tăng cường thông khí khu vực nhà ở'
         },
         {
           step: 9,
-          stepColor: '#423144',
+          stepColor: '#900d0d',
           contentColor: '#cf1b1b',
           content: 'Vệ sinh nơi ở, cơ quan, trường học, xí nghiệp, nhà máy'
         },
         {
           step: 10,
           stepColor: '#0f4c75',
-          contentColor: '#bbe1fa',
+          contentColor: '#0fabbc',
           content: 'Giữ ấm cho cơ thể, tăng cường sức khoẻ bằng cách sinh hoạt hợp lý (ăn uống, nghỉ ngơi và luyện tập thể thao)'
         }
       ],
@@ -105,6 +107,9 @@ export default class Home extends Component {
   }
 
   _getReportByRegion = async (ISO) => {
+    this.setState({
+      refreshing: true
+    })
     await Axios.get(`${URL}/reports?iso=${ISO}`)
       .then(res => {
         console.log(`Trang thai: ` + res.status)
@@ -121,13 +126,14 @@ export default class Home extends Component {
       })
   }
 
-  renderItemAntiCovidView = ({item}) =>
+  renderItemAntiCovidView = ({ item }) =>
     <View style={{
       height: 130,
       width: 250,
       marginRight: 5,
       borderRadius: 5,
       flexDirection: 'row',
+      marginHorizontal: 10,
       backgroundColor: `${item.contentColor}`
     }}>
       <View style={{
@@ -183,14 +189,31 @@ export default class Home extends Component {
 
   render() {
     return (
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, marginHorizontal: 10 }}>
-        <StatusBar barStyle='dark-content' />
-        <Text style={{
-          marginTop: 70,
-          fontSize: 30,
-          fontWeight: 'bold',
-          color: 'grey'
-        }}>THÔNG TIN DỊCH BỆNH</Text>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+        <View style={{
+          flexDirection: 'row',
+          marginTop: 60,
+          alignItems: 'center'
+        }}>
+          <Text style={{
+            fontSize: 30,
+            fontWeight: 'bold',
+            color: 'grey',
+            marginHorizontal: 10
+          }}>THÔNG TIN DỊCH BỆNH</Text>
+          <IconButton
+            icon="refresh"
+            color='grey'
+            size={20}
+            style={{
+              position: 'absolute',
+              right: 0
+            }}
+            onPress={() => {
+              this._getReportByRegion('VNM')
+            }}
+          />
+        </View>
         {
           this.state.refreshing
             ?
@@ -280,17 +303,15 @@ export default class Home extends Component {
               </View>
             </View>
         }
-        <Caption>Cập nhật {this.state.date}</Caption>
+        <Caption style={{marginHorizontal: 10}}>Cập nhật {this.state.date}</Caption>
         <View style={{
-          flexDirection: 'row',
           marginVertical: 10,
-          justifyContent: 'space-evenly'
+          marginHorizontal: 10
         }}>
-          <Button mode='contained'>KHAI BÁO Y TẾ</Button>
-          <Button mode='contained'>HƯỚNG DẪN PHÒNG DỊCH</Button>
+          <Button style={{ width: '35%' }} mode='contained'>KHAI BÁO Y TẾ</Button>
         </View>
 
-        <Caption>Phòng chống COVID</Caption>
+        <Caption style={{marginHorizontal: 10}}>Phòng chống COVID</Caption>
         <View style={{
           marginVertical: 10
         }}>
@@ -302,11 +323,12 @@ export default class Home extends Component {
             renderItem={this.renderItemAntiCovidView}
           />
         </View>
-        <Caption>Tin nóng trong ngày</Caption>
+        <Caption style={{marginHorizontal: 10}}>Tin nóng trong ngày</Caption>
         <View
           style={{
             marginVertical: 10,
-            height: '100%'
+            height: '100%',
+            marginHorizontal: 10
           }}
         >
           <FlatList
@@ -315,6 +337,13 @@ export default class Home extends Component {
             renderItem={this.renderItem}
           />
         </View>
+        {
+          this.state.showKBYT
+            ?
+            <KhaiBaoYTe />
+            : null
+        }
+
       </ScrollView>
     );
   }
